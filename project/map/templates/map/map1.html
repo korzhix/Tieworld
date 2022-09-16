@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
+    <title>Tie world</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 85%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_e6f51be2688384922a18dcb58e7d308d {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+</head>
+<body>    
+<nav class="navbar navbar-expand-lg bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for("index") }}">Мир черепицы</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{{ url_for("map.show_map") }}">Карта</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for("blog.list_articles") }}">Статьи</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+            <div class="folium-map" id="map_e6f51be2688384922a18dcb58e7d308d" ></div>
+<footer class="page-footer font-small blue pt-4">
+
+  <!-- Footer Links -->
+      <div class="container-fluid text-center text-md-left">
+
+        <!-- Grid row -->
+        <div class="row">
+
+          <!-- Grid column -->
+          <div class="col-md-6 mt-md-0 mt-3">
+
+            <!-- Content -->
+            <h5 class="text-uppercase">Ссылки и контакты</h5>
+            <p>Вы можете связаться с нами указанным способами, а также посмотреть другие наши ресурсы</p>
+
+          </div>
+          <!-- Grid column -->
+
+          <hr class="clearfix w-100 d-md-none pb-3">
+
+          <!-- Grid column -->
+          <div class="col-md-3 mb-md-0 mb-3">
+
+            <!-- Links -->
+            <h5 class="text-uppercase">Контакты</h5>
+
+            <ul class="list-unstyled">
+              <li>
+                <a href="https://t.me/starcherepitsa">Мы в Telegram</a>
+              </li>
+            </ul>
+
+          </div>
+          <!-- Grid column -->
+
+        </div>
+        <!-- Grid row -->
+
+      </div>
+      <!-- Footer Links -->
+
+      <!-- Copyright -->
+      <div class="footer-copyright text-center py-3">© 2020 Copyright:
+        <a href="/"> MDBootstrap.com</a>
+      </div>
+      <!-- Copyright -->
+
+    </footer>
+<!-- Footer -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+</body>
+<script>    
+    
+            var map_e6f51be2688384922a18dcb58e7d308d = L.map(
+                "map_e6f51be2688384922a18dcb58e7d308d",
+                {
+                    center: [45.263034195319385, 37.4354044603708],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 8,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_e51980fbbd5ed9796da4efccba88839a = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var marker_a350e02ea58ea5ee5275bd366b04e4eb = L.marker(
+                [44.9960955, 38.9988045],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_5508131aba0c8dc5aafc8641b88193f7 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_a350e02ea58ea5ee5275bd366b04e4eb.setIcon(icon_5508131aba0c8dc5aafc8641b88193f7);
+        
+    
+        var popup_b32d558e41b971c68dfc85ae79409d02 = L.popup({"maxWidth": "100%"});
+
+            
+            var html_4df21638508cabcd9c3fb6a95b670127 = $(`<div id="html_4df21638508cabcd9c3fb6a95b670127" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/13">Барон Леонгард Васильевич Штейнгель</a><br><br> <a href="http://127.0.0.1:5000/article/14">Братья Мартын Степанович и Эммануил Степанович Кузнецовы</a> <br><br> <a href="http://127.0.0.1:5000/article/15">Лю Нахлухович Трахов</a><br><br> <a href="http://127.0.0.1:5000/article/16">Павел Григорьевич Лавровский</a> </div>`)[0];
+            popup_b32d558e41b971c68dfc85ae79409d02.setContent(html_4df21638508cabcd9c3fb6a95b670127);
+        
+
+        marker_a350e02ea58ea5ee5275bd366b04e4eb.bindPopup(popup_b32d558e41b971c68dfc85ae79409d02)
+        ;
+
+        
+    
+    
+            var marker_9612a1ece5b34b93a3b1b4febdf872d9 = L.marker(
+                [43.024593, 44.68211],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_086ec4ca1195cb8882fc0e271e904617 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "darkgreen", "prefix": "glyphicon"}
+            );
+            marker_9612a1ece5b34b93a3b1b4febdf872d9.setIcon(icon_086ec4ca1195cb8882fc0e271e904617);
+        
+    
+        var popup_246ffdb2267f6cef367c82b8afb1a2ea = L.popup({"maxWidth": "100%"});
+
+        
+            var html_01c9757729037135cac1d32251533b4c = $(`<div id="html_01c9757729037135cac1d32251533b4c" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/21">Леонгард Васильевич Штейнгель и Владимир Иосифович Грозмани</a></div>`)[0];
+            popup_246ffdb2267f6cef367c82b8afb1a2ea.setContent(html_01c9757729037135cac1d32251533b4c);
+        
+
+        marker_9612a1ece5b34b93a3b1b4febdf872d9.bindPopup(popup_246ffdb2267f6cef367c82b8afb1a2ea)
+        ;
+
+        
+    
+    
+            var marker_efa2bed480a0cd7f299818c100c295af = L.marker(
+                [46.16103645, 33.69278391193038],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_258a9e0453fe75596a8401c2d08de719 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_efa2bed480a0cd7f299818c100c295af.setIcon(icon_258a9e0453fe75596a8401c2d08de719);
+        
+    
+        var popup_72f96374580768ff61db361ad1e112f3 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_d59530bde4a9f891908fb6dc36d7788a = $(`<div id="html_d59530bde4a9f891908fb6dc36d7788a" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/26">Д.Я. Кайзер – экономия Бей-Су</a></div>`)[0];
+            popup_72f96374580768ff61db361ad1e112f3.setContent(html_d59530bde4a9f891908fb6dc36d7788a);
+        
+
+        marker_efa2bed480a0cd7f299818c100c295af.bindPopup(popup_72f96374580768ff61db361ad1e112f3)
+        ;
+
+        
+    
+    
+            var marker_3333bd41a6fcc33a24c76db779a448e3 = L.marker(
+                [46.184349, 41.084557],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_c8223b4cbdf7e1cfc1e62416ba2e9939 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "black", "prefix": "glyphicon"}
+            );
+            marker_3333bd41a6fcc33a24c76db779a448e3.setIcon(icon_c8223b4cbdf7e1cfc1e62416ba2e9939);
+        
+    
+        var popup_57f6a5a55396a9a8478f25aa20177654 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_0b38c44b4fa2d3dd7ecd97059e1158a8 = $(`<div id="html_0b38c44b4fa2d3dd7ecd97059e1158a8" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/29">Г.В. Золотарёв – с. Песчанокопское</a> </div>`)[0];
+            popup_57f6a5a55396a9a8478f25aa20177654.setContent(html_0b38c44b4fa2d3dd7ecd97059e1158a8);
+        
+
+        marker_3333bd41a6fcc33a24c76db779a448e3.bindPopup(popup_57f6a5a55396a9a8478f25aa20177654)
+        ;
+
+        
+    
+    
+            var marker_e25301df04f853c8211f6e096268fe0e = L.marker(
+                [47.0957648, 37.5499621],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_ed99c98c709c02e9ce83ede3888ec847 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "white", "prefix": "glyphicon"}
+            );
+            marker_e25301df04f853c8211f6e096268fe0e.setIcon(icon_ed99c98c709c02e9ce83ede3888ec847);
+        
+    
+        var popup_d3493540bfef6f57bb3ed2cae661714d = L.popup({"maxWidth": "100%"});
+
+        
+            var html_f69fe7ec452aebcbb8e05673fc4ca186 = $(`<div id="html_f69fe7ec452aebcbb8e05673fc4ca186" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/22">Давид Александрович Хараджаев (Александровский завод)</a></div>`)[0];
+            popup_d3493540bfef6f57bb3ed2cae661714d.setContent(html_f69fe7ec452aebcbb8e05673fc4ca186);
+        
+
+        marker_e25301df04f853c8211f6e096268fe0e.bindPopup(popup_d3493540bfef6f57bb3ed2cae661714d)
+        ;
+
+        
+    
+    
+            var marker_8ad1e728639e7b5c9d5d13b777da35fa = L.marker(
+                [45.215729, 37.894539],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_192362b1f3bece0a8a641c3c9bc70e12 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_8ad1e728639e7b5c9d5d13b777da35fa.setIcon(icon_192362b1f3bece0a8a641c3c9bc70e12);
+        
+    
+        var popup_778e1102c435f6c78ec2c886b439806a = L.popup({"maxWidth": "100%"});
+
+        
+            var html_61dd633ed006cd7456749ccb01d045bd = $(`<div id="html_61dd633ed006cd7456749ccb01d045bd" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/1">Братья Макар Иванович и Архип Иванович Петрохалко – ст. Анастасиевская</a><br><br><a href="http://127.0.0.1:5000/article/30">«ККМ» Колхоз Красный Маяк – ст. Анастасиевская.</a></div>`)[0];
+            popup_778e1102c435f6c78ec2c886b439806a.setContent(html_61dd633ed006cd7456749ccb01d045bd);
+        
+
+        marker_8ad1e728639e7b5c9d5d13b777da35fa.bindPopup(popup_778e1102c435f6c78ec2c886b439806a)
+        ;
+
+        
+    
+    
+            var marker_2e91680513c60ec5234a4de6a205b298 = L.marker(
+                [46.3212449, 39.389554],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_8c8fa5d5a4a0b7540726b7ddd58febef = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_2e91680513c60ec5234a4de6a205b298.setIcon(icon_8c8fa5d5a4a0b7540726b7ddd58febef);
+        
+    
+        var popup_a3f7620dab92b816d2f86f15ef3aa9f7 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_2dd6503e75aae819ef7cb81d30c0b3ad = $(`<div id="html_2dd6503e75aae819ef7cb81d30c0b3ad" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/17">Виталий Васильевич Атаманов – ст. Уманская</a><br><br><a href="http://127.0.0.1:5000/article/19">Иван Иванович Цинович – ст. Уманская</a></div>`)[0];
+            popup_a3f7620dab92b816d2f86f15ef3aa9f7.setContent(html_2dd6503e75aae819ef7cb81d30c0b3ad);
+        
+
+        marker_2e91680513c60ec5234a4de6a205b298.bindPopup(popup_a3f7620dab92b816d2f86f15ef3aa9f7)
+        ;
+
+        
+    
+    
+            var marker_48c8920796dc86349d84f72f4b024ed2 = L.marker(
+                [44.857923099999994, 41.323467703324106],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_cce934b4aae940ce2bb077a3d277e684 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_48c8920796dc86349d84f72f4b024ed2.setIcon(icon_cce934b4aae940ce2bb077a3d277e684);
+        
+    
+        var popup_4e68041f72a68378d8a0151eccc849b1 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_f687c2ba37ff4c1b9ec67c33f2ae1685 = $(`<div id="html_f687c2ba37ff4c1b9ec67c33f2ae1685" style="width: 100.0%; height: 100.0%;"> <a href="">Коноковский черепичный завод</a></div>`)[0];
+            popup_4e68041f72a68378d8a0151eccc849b1.setContent(html_f687c2ba37ff4c1b9ec67c33f2ae1685);
+        
+
+        marker_48c8920796dc86349d84f72f4b024ed2.bindPopup(popup_4e68041f72a68378d8a0151eccc849b1)
+        ;
+
+        
+    
+    
+            var marker_fd40fa516b4428512df78a63e4547aae = L.marker(
+                [45.121292, 37.638737],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_8363765d36970572134ba6127ffeb2d8 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_fd40fa516b4428512df78a63e4547aae.setIcon(icon_8363765d36970572134ba6127ffeb2d8);
+        
+    
+        var popup_0dbc1433bac14880207ffe176501c30b = L.popup({"maxWidth": "100%"});
+
+        
+            var html_894c5d8c22735563e137800a0c5c29c1 = $(`<div id="html_894c5d8c22735563e137800a0c5c29c1" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/9">П.П. Толстый</a><br><br>   <a href="http://127.0.0.1:5000/article/31">1.В.К-Т.</a></div>`)[0];
+            popup_0dbc1433bac14880207ffe176501c30b.setContent(html_894c5d8c22735563e137800a0c5c29c1);
+        
+
+        marker_fd40fa516b4428512df78a63e4547aae.bindPopup(popup_0dbc1433bac14880207ffe176501c30b)
+        ;
+
+        
+    
+    
+            var marker_1e7d14e7e2f5dd6e615c64d1599d7402 = L.marker(
+                [45.2672191, 38.4653294],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_112b62078882a19df1c510fc5eb6abd5 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_1e7d14e7e2f5dd6e615c64d1599d7402.setIcon(icon_112b62078882a19df1c510fc5eb6abd5);
+        
+    
+        var popup_cba5528cb0b89ed86cec21993a931fb0 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_78d94f6944a73a566f6f129bf14d2a61 = $(`<div id="html_78d94f6944a73a566f6f129bf14d2a61" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/11">Пантелеймон Анистратович Рижко</a></div>`)[0];
+            popup_cba5528cb0b89ed86cec21993a931fb0.setContent(html_78d94f6944a73a566f6f129bf14d2a61);
+        
+
+        marker_1e7d14e7e2f5dd6e615c64d1599d7402.bindPopup(popup_cba5528cb0b89ed86cec21993a931fb0)
+        ;
+
+        
+    
+    
+            var marker_b9d8bdfc8445541536ae747224f82ee4 = L.marker(
+                [44.5655503, 33.45959860374677],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_9added329532ab9328f0862e8b8426a0 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_b9d8bdfc8445541536ae747224f82ee4.setIcon(icon_9added329532ab9328f0862e8b8426a0);
+        
+    
+        var popup_7d93a685c3a547e8e85753feb15a8793 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_582e3592adbb84c8eea5d6d76b448078 = $(`<div id="html_582e3592adbb84c8eea5d6d76b448078" style="width: 100.0%; height: 100.0%;"> <a href="http://127.0.0.1:5000/article/27">Фёдор Оттонович Шталь</a></div>`)[0];
+            popup_7d93a685c3a547e8e85753feb15a8793.setContent(html_582e3592adbb84c8eea5d6d76b448078);
+        
+
+        marker_b9d8bdfc8445541536ae747224f82ee4.bindPopup(popup_7d93a685c3a547e8e85753feb15a8793)
+        ;
+
+        
+    
+    
+            var marker_b45ac126fa1f3620a06ba48aade62051 = L.marker(
+                [47.2153657, 38.9285216],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_3c8b79016f2c3d265e607da99890543e = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "orange", "prefix": "glyphicon"}
+            );
+            marker_b45ac126fa1f3620a06ba48aade62051.setIcon(icon_3c8b79016f2c3d265e607da99890543e);
+        
+    
+        var popup_bc9f7cbdecc8791a4980b7321af1c1d7 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_c792c2eb4c6c37920d63e889cbd3e3b4 = $(`<div id="html_c792c2eb4c6c37920d63e889cbd3e3b4" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/28">Михаил Иванович Скараманга</a></div>`)[0];
+            popup_bc9f7cbdecc8791a4980b7321af1c1d7.setContent(html_c792c2eb4c6c37920d63e889cbd3e3b4);
+        
+
+        marker_b45ac126fa1f3620a06ba48aade62051.bindPopup(popup_bc9f7cbdecc8791a4980b7321af1c1d7)
+        ;
+
+        
+    
+    
+            var marker_18de29feb5f69cf65670cc74b04b22a2 = L.marker(
+                [45.154831, 38.201092],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_b3892c0f0ce30b1a2645515794785b11 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_18de29feb5f69cf65670cc74b04b22a2.setIcon(icon_b3892c0f0ce30b1a2645515794785b11);
+        
+    
+        var popup_feab628307015d36e687387d561073b0 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_be89991986f067a5da81c11808305efc = $(`<div id="html_be89991986f067a5da81c11808305efc" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/2">Братья Макар Иванович и Архип Иванович Петрохалко</a><br><br>  <a href="http://127.0.0.1:5000/article/3">В. Ворожбиев</a><br><br><a href="http://127.0.0.1:5000/article/4">С.и В. – ст. Троицкая</a></div>`)[0];
+            popup_feab628307015d36e687387d561073b0.setContent(html_be89991986f067a5da81c11808305efc);
+        
+
+        marker_18de29feb5f69cf65670cc74b04b22a2.bindPopup(popup_feab628307015d36e687387d561073b0)
+        ;
+
+        
+    
+    
+            var marker_a20fbfee100142a7aa5ec7e57fa74fc0 = L.marker(
+                [45.033669, 35.3753628],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_f02ba7b7499dddc4a1de9bf4282645fa = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_a20fbfee100142a7aa5ec7e57fa74fc0.setIcon(icon_f02ba7b7499dddc4a1de9bf4282645fa);
+        
+    
+        var popup_dfe6f1cfb536cca0f998197ab5be561c = L.popup({"maxWidth": "100%"});
+
+        
+            var html_14bdf476de34b2bd88ab97b260a2e1b2 = $(`<div id="html_14bdf476de34b2bd88ab97b260a2e1b2" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/23">Братья А. и П. Визировы</a><br><br><a href="http://127.0.0.1:5000/article/24">Братья Спиридон и Николай Коссичи</a><br><br><a href="http://127.0.0.1:5000/article/25">Август Генрихович Перренуд</a></div>`)[0];
+            popup_dfe6f1cfb536cca0f998197ab5be561c.setContent(html_14bdf476de34b2bd88ab97b260a2e1b2);
+        
+
+        marker_a20fbfee100142a7aa5ec7e57fa74fc0.bindPopup(popup_dfe6f1cfb536cca0f998197ab5be561c)
+        ;
+
+        
+    
+    
+            var marker_26a82edfe57054157f248d5158a71c1f = L.marker(
+                [45.366794, 38.2115057],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_0892f21713784db664cdeb4d3b6d5268 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_26a82edfe57054157f248d5158a71c1f.setIcon(icon_0892f21713784db664cdeb4d3b6d5268);
+        
+    
+        var popup_f0fe4f0ef524ab717aeef5629c536915 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_03495263fe556def5de1c7521a815367 = $(`<div id="html_03495263fe556def5de1c7521a815367" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/12">Иван Яковлевич Зеленский – ст. Полтавская</a></div>`)[0];
+            popup_f0fe4f0ef524ab717aeef5629c536915.setContent(html_03495263fe556def5de1c7521a815367);
+        
+
+        marker_26a82edfe57054157f248d5158a71c1f.bindPopup(popup_f0fe4f0ef524ab717aeef5629c536915)
+        ;
+
+        
+    
+    
+            var marker_b1efb5ce065ff82752d2ab44e85aebda = L.marker(
+                [44.9993585, 41.1294061],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_3b791946b540cf490c2fd70a996188e8 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_b1efb5ce065ff82752d2ab44e85aebda.setIcon(icon_3b791946b540cf490c2fd70a996188e8);
+        
+    
+        var popup_67e62e58d4aea72626afa1f4d6e2e562 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_157715a93a5a084f8f7ce70d58cfad68 = $(`<div id="html_157715a93a5a084f8f7ce70d58cfad68" style="width: 100.0%; height: 100.0%;"> <a href="http://127.0.0.1:5000/article/18">А.С. Ильин</a></div>`)[0];
+            popup_67e62e58d4aea72626afa1f4d6e2e562.setContent(html_157715a93a5a084f8f7ce70d58cfad68);
+        
+
+        marker_b1efb5ce065ff82752d2ab44e85aebda.bindPopup(popup_67e62e58d4aea72626afa1f4d6e2e562)
+        ;
+
+        
+    
+    
+            var marker_c2ea5d52aa66584d49cd1463b569f0d9 = L.marker(
+                [44.94875, 38.131062],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_1157116c820e4cbb51d2a2a3ce4b97b2 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_c2ea5d52aa66584d49cd1463b569f0d9.setIcon(icon_1157116c820e4cbb51d2a2a3ce4b97b2);
+        
+    
+        var popup_84403bcf79751eb1726ac03c01a4b46c = L.popup({"maxWidth": "100%"});
+
+        
+            var html_71a64e2dba9e46c46c0040c381a76838 = $(`<div id="html_71a64e2dba9e46c46c0040c381a76838" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/10">А.К. Калач-Оглы (Колоджов) – с. Мерчанское</a></div>`)[0];
+            popup_84403bcf79751eb1726ac03c01a4b46c.setContent(html_71a64e2dba9e46c46c0040c381a76838);
+        
+
+        marker_c2ea5d52aa66584d49cd1463b569f0d9.bindPopup(popup_84403bcf79751eb1726ac03c01a4b46c)
+        ;
+
+        
+    
+    
+            var marker_5cee46ed72830f624c7fd56d5f9f770a = L.marker(
+                [44.1483446, 43.468204374580054],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_6a0772e0df2b46bb42b5cae080a0b587 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "darkgreen", "prefix": "glyphicon"}
+            );
+            marker_5cee46ed72830f624c7fd56d5f9f770a.setIcon(icon_6a0772e0df2b46bb42b5cae080a0b587);
+        
+    
+        var popup_17d57b98a1a21ecac8b2aafeb8e36733 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_0f2eb1c873866c1f3ba5151e00e558c7 = $(`<div id="html_0f2eb1c873866c1f3ba5151e00e558c7" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/20">Кирилл Степанович Кальченко</a></div>`)[0];
+            popup_17d57b98a1a21ecac8b2aafeb8e36733.setContent(html_0f2eb1c873866c1f3ba5151e00e558c7);
+        
+
+        marker_5cee46ed72830f624c7fd56d5f9f770a.bindPopup(popup_17d57b98a1a21ecac8b2aafeb8e36733)
+        ;
+
+        
+    
+    
+            var marker_7ca15b010cae7f2eff9a8751ac2b7428 = L.marker(
+                [44.9295889, 37.9880177],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_a1e36c971b5c704627254b32a7bc4d41 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
+            );
+            marker_7ca15b010cae7f2eff9a8751ac2b7428.setIcon(icon_a1e36c971b5c704627254b32a7bc4d41);
+        
+    
+        var popup_e66ac0a88f44d41297531c9b244e1c03 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_b1c6fa6c5d6dd369624e96494a232a28 = $(`<div id="html_b1c6fa6c5d6dd369624e96494a232a28" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/5">Алексей Степанович Ворожбий</a><br><br><a href="http://127.0.0.1:5000/article/6">Емельян Тимофеевич Ковтун</a><br><br> <a href="http://127.0.0.1:5000/article/7">Маркион Тимофеевич Ковтун</a><br><br><a href="http://127.0.0.1:5000/article/8">Т.Е. Добровольский</a></div>`)[0];
+            popup_e66ac0a88f44d41297531c9b244e1c03.setContent(html_b1c6fa6c5d6dd369624e96494a232a28);
+        
+
+        marker_7ca15b010cae7f2eff9a8751ac2b7428.bindPopup(popup_e66ac0a88f44d41297531c9b244e1c03)
+        ;
+
+        
+    
+    
+            var marker_587dfc0530702539e190affc1f4c1452 = L.marker(
+                [44.947523700000005, 34.10757757802299],
+                {}
+            ).addTo(map_e6f51be2688384922a18dcb58e7d308d);
+        
+    
+            var icon_cad96286ef6e0f22478257bac72ef629 = L.AwesomeMarkers.icon(
+                {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "green", "prefix": "glyphicon"}
+            );
+            marker_587dfc0530702539e190affc1f4c1452.setIcon(icon_cad96286ef6e0f22478257bac72ef629);
+        
+    
+        var popup_4ece18e0b1d9ed18d4f1c7ffa0b86eec = L.popup({"maxWidth": "100%"});
+
+        
+            var html_b8a063aaf5da540cb2ecd626cd770fee = $(`<div id="html_b8a063aaf5da540cb2ecd626cd770fee" style="width: 100.0%; height: 100.0%;"><a href="http://127.0.0.1:5000/article/33">Артель имени Водопьянова – г. Симферополь</a></div>`)[0];
+            popup_4ece18e0b1d9ed18d4f1c7ffa0b86eec.setContent(html_b8a063aaf5da540cb2ecd626cd770fee);
+        
+
+        marker_587dfc0530702539e190affc1f4c1452.bindPopup(popup_4ece18e0b1d9ed18d4f1c7ffa0b86eec)
+        ;
+
+        
+    
+</script>

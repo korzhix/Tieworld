@@ -1,0 +1,14 @@
+.DS_Store
+.env
+.flaskenv
+*.pyc
+*.pyo
+__pycache__/
+env*
+dist/
+build/
+*.egg
+.tox/
+.cache/
+.idea/
+
