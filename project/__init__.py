@@ -10,7 +10,6 @@ app.config['SECRET_KEY'] = 'mysecretkey'
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['GOOGLEMAPS_KEY'] = "AIzaSyC4lPxE2LRtSMtNYa_4Cyme-6rrx34zrhg"
 
 db = SQLAlchemy(app)
 Migrate(app, db)
