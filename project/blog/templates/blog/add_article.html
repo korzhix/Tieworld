@@ -4,26 +4,61 @@
 <div class="container">
  <form class="form-group" method="POST" enctype="multipart/form-data">
      {{ form.hidden_tag() }}
-
+     <h3>Информация о местоположении</h3>
      <div class="form-group">
-     {{ form.header.label(class="form-control-label") }}
-     {{ form.header(class="form-control form-control-lg ") }}
+     {{ form.lat.label(class="form-control-label") }}
+     {{ form.lat(class="form-control form-control-lg ") }}
+     </div>
+     <div class="form-group">
+     {{ form.long.label(class="form-control-label") }}
+     {{ form.long(class="form-control form-control-lg") }}
+     </div>
+     <div class="form-group">
+     {{ form.location_name.label(class="form-control-label") }}
+     {{ form.location_name(class="form-control form-control-lg") }}
+     </div>
+     <div class="form-group">
+     {{ form.district.label(class="form-control-label") }}
+     {{ form.district(class="form-control form-control-lg") }}
+     </div>
+      <div class="form-group">
+     {{ form.region.label(class="form-control-label") }}
+     {{ form.region(class="form-control form-control-lg") }}
+     </div>
+     <div class="form-group">
+     {{ form.country.label(class="form-control-label") }}
+     {{ form.country(class="form-control form-control-lg") }}
+     </div>
+     <h3>Информация о производителе</h3>
+     <div class="form-group">
+     {{ form.manufacturer_name.label(class="form-control-label") }}
+     {{ form.manufacturer_name(class="form-control form-control-lg") }}
+     </div>
+     <div class="form-group">
+     {{ form.literature.label(class="form-control-label") }}
+     {{ form.literature(class="form-control form-control-lg") }}
+     </div>
+     <h4>Укажите данные в формате: Характеристика1: значение, Характеристика2: значение</h4>
+     <div class="form-group">
+     {{ form.manufacturer_other.label(class="form-control-label") }}
+     {{ form.manufacturer_other(class="form-control form-control-lg") }}
+     </div>
+     <h3>Статья</h3>
+     <div class="form-group">
+     {{ form.title.label(class="form-control-label") }}
+     {{ form.title(class="form-control form-control-lg") }}
      </div>
      <div class="form-group">
      {{ form.content.label(class="form-control-label") }}
      {{ form.content(class="form-control form-control-lg") }}
      </div>
      <div class="form-group">
-     {{ form.repres.label(class="form-control-label") }}
-     {{ form.repres(class="form-control form-control-lg") }}
+     {{ form.rewiew.label(class="form-control-label") }}
+     {{ form.rewiew(class="form-control form-control-lg") }}
      </div>
      <div class="form-group">
-     {{ form.location.label(class="form-control-label") }}
-     {{ form.location(class="form-control form-control-lg") }}
-     </div>
-      <div class="form-group">
-     {{ form.region.label(class="form-control-label") }}
-     {{ form.region(class="form-control form-control-lg") }}
+     {{ form.tags.label(class="form-control-label") }}
+     {{ form.tags(class="form-control form-control-lg") }}
      </div>
      <div class="form-group">
      {{ form.pictures.label(class="form-control-label") }}

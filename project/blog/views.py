@@ -1,9 +1,10 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint, abort
 from project import db, app
 from flask import request
-from project.models import Article
+from project.models import Article, Location,  Manufacturer #ManufacturerLocation
 from project.blog.forms import AddArticleForm
 from project.blog.picture_handler import add_pic
+from datetime import datetime
 
 blog = Blueprint('blog', __name__, template_folder='templates/blog', url_prefix='/article')
 
@@ -12,19 +13,39 @@ blog = Blueprint('blog', __name__, template_folder='templates/blog', url_prefix=
 def add():
 
     form = AddArticleForm()
-
+    locations = Location.query.all()
+    manufacturers = Manufacturer.query.all()
+    ### КОСТЫЛЬ НА обработку искл-я картинок
     if form.validate_on_submit():
         pics = request.files.getlist(form.pictures.name)
         paths = []
-        if pics:
-            for pic in pics:
-                picture_contents = pic.stream.read()
-                filepath = add_pic(pic_content=picture_contents, pic_name=pic.filename, title=form.header.data)
-                paths.append(filepath)
-        post = Article(header=form.header.data, content=form.content.data,
-                       repres=form.repres.data, location=form.location.data, region=form.region.data,
-                       images=str(paths))
+        try:
+            if pics:
+                for pic in pics:
+                    picture_contents = pic.stream.read()
+                    filepath = add_pic(pic_content=picture_contents, pic_name=pic.filename, title=form.title.data)
+                    paths.append(filepath)
+        except:
+            paths = ''
+        # TODO:
+        #  1) Значение по умолчанию для аргументов tags и не только
+        post = Article(title=form.title.data, content=form.content.data, repres=form.rewiew.data,
+                       created_at=datetime.utcnow(), images=str(paths), tags=form.tags.data)
+        location = Location(lat=form.lat.data, long=form.long.data, name=form.location_name.data,
+                            district=form.district.data, region=form.region.data,
+                            country=form.country.data)
+
+        data = '{' + str(form.manufacturer_other.data) + '}'
+        manufacturer = Manufacturer(name=form.manufacturer_name.data,
+                                    literature=form.literature.data,
+                                    other=data)
+        post.locations.append(location)
+        post.manufacturers.append(manufacturer)
+        location.manufacturers.append(manufacturer)
+
         db.session.add(post)
+        db.session.add(location)
+        db.session.add(manufacturer)
         db.session.commit()
         flash('Статья создана')
         # return render_template('add_article.html', form=form)
