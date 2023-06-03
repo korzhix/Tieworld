@@ -76,11 +76,7 @@ class Color(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     color_code = db.Column(db.String(24))
     color_name = db.Column(db.String(24))
-    location = db.relationship("Location", uselist=False, backref="color")
-
-    def __init__(self, name: str, code: str):
-        self.color_name = name
-        self.color_code = code
+    locations = db.relationship("Location", backref="color")
 
 
 class Location(db.Model):
@@ -92,8 +88,8 @@ class Location(db.Model):
     district = db.Column(db.String(64))
     region = db.Column(db.String(64))
     country = db.Column(db.String(64))
+    created_at = db.Column(db.DateTime)
     color_id = db.Column(db.Integer, db.ForeignKey('colors.id'))
-    #color = db.relationship("Color", uselist=False, backref="location")
     manufacturers = db.relationship("Manufacturer",
                                     secondary=manufacturer_location,
                                     backref="locations")

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="jumbotron container">
+    <h1>Локации</h1>
+    <p>Текущие локации: просмотрите существующие локации, смотрите, редактируйте, или добавьте новые</p>
+    <div class="row">
+        <div class="col">
+            <hr>
+            <h3>{{ type_of_action }} локацию</h3>
+            <hr>
+            <form class="form-control w-75" method="POST">
+                 {{ form.hidden_tag() }}
+                <div class="form-group">
+                     {{ form.location_name.label(class="form-control-label") }}
+                     {{ form.location_name(class="form-control form-control-lg") }}
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                             {{ form.lat.label(class="form-control-label") }}
+                             {{ form.lat(class="form-control form-control-sm ") }}
+                         </div>
+                    </div>
+                <div class="col">
+                     <div class="form-group">
+                         {{ form.long.label(class="form-control-label") }}
+                         {{ form.long(class="form-control form-control-sm") }}
+                     </div>
+                </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                     <div class="form-group">
+                         {{ form.region.label(class="form-control-label") }}
+                         {{ form.region(class="form-control form-control-lg") }}
+                     </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                             {{ form.color.label(class="form-control-label") }}
+                             {{ form.color(class="form-control form-control-lg") }}
+                        </div>
+                    </div>
+
+                </div>
+                 <div class="form-group">
+                    {{ form.district.label(class="form-control-label") }}
+                    {{ form.district(class="form-control form-control-lg") }}
+                 </div>
+                 <div class="form-group">
+                    {{ form.country.label(class="form-control-label") }}
+                    {{ form.country(class="form-control form-control-lg") }}
+                 </div>
+                <div class="form-group">
+                     {{ form.submit(class="form control btn btn-primary") }}
+                </div>
+          </form>
+        </div>
+        <div class="col">
+            <hr>
+            <h3>Вы также можете добавить</h3>
+            <hr>
+            <a href="/color/crud" target="_blank" class="btn btn-primary" >Новый цвет</a>
+            <p>Если его нет в списке</p>
+        </div>
+    </div>
+      <hr>
+  <h3>Текущие локации: </h3>
+      <hr>
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+
+    {% for loc in locs %}
+    <div class="col">
+        <div class="card h-100">
+              <img src="/static/map_photos/maP-marker.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h2>{{ loc.name }}</h2>
+                <hr style="width: 30%;border: 10px solid {{ loc.color.color_code }}; border-radius: 5px;">
+                <p class="card-text">{{ loc.colors }}</p>
+            </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><b>Координаты: </b>{{ loc.lat }}  {{ loc.long }} </li>
+            <li class="list-group-item"><b>Регион: </b>{{ loc.region }}</li>
+            <li class="list-group-item"><b>Район: </b>{{ loc.district }}</li>
+            <li class="list-group-item"><b>Страна: </b>{{ loc.country }}</li>
+            <li class="list-group-item"><b>Производители: </b> {% for m in loc.manufacturers %} <a href="/manufacturer/crud">{{ m.name }} </a>   {% endfor %}</li>
+            <li class="list-group-item"><b>Статьи: </b>{% for a in loc.articles %} <a href="/article/{{ a.id }}">{{ a.title }} </a> {% endfor %} </li>
+        </ul>
+        <div class="card-body">
+            <a href="/location/update/{{ loc.id }}" class="btn btn-primary">Редактировать</a>
+            <a href="/location/delete/{{ loc.id }}" class="btn btn-primary">Удалить</a>
+        </div>
+        </div>
+    </div>
+   {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}
+

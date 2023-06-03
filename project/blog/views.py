@@ -1,21 +1,23 @@
-from flask import render_template, url_for, flash, redirect, request, Blueprint, abort
+from flask import render_template, url_for, flash, redirect, request, Blueprint, abort, current_app
 from project import db, app
 from flask import request
-from project.models import Article, Location,  Manufacturer #ManufacturerLocation
+from project.models import Article, Location, Manufacturer  # ManufacturerLocation
 from project.blog.forms import AddArticleForm
 from project.blog.picture_handler import add_pic
 from datetime import datetime
-
+from flask_ckeditor import upload_success, upload_fail
+import os
 blog = Blueprint('blog', __name__, template_folder='templates/blog', url_prefix='/article')
 
 
-@blog.route('/add_article', methods=['GET', 'POST'])
+@blog.route('/add', methods=['GET', 'POST'])
 def add():
-
     form = AddArticleForm()
-    locations = Location.query.all()
-    manufacturers = Manufacturer.query.all()
-    ### КОСТЫЛЬ НА обработку искл-я картинок
+    last_created = Article.query.order_by(Article.created_at.desc()).limit(5)
+    locs = Location.query.all()
+    form.locations.choices = [(l.id, l.name) for l in locs]
+    mans = Manufacturer.query.all()
+    form.manufacturers.choices = [(m.id, m.name) for m in mans]
     if form.validate_on_submit():
         pics = request.files.getlist(form.pictures.name)
         paths = []
@@ -27,43 +29,36 @@ def add():
                     paths.append(filepath)
         except:
             paths = ''
-        # TODO:
-        #  1) Значение по умолчанию для аргументов tags и не только
+        location_ids = form.locations.data
+        manufacturer_ids = form.manufacturers.data
         post = Article(title=form.title.data, content=form.content.data, repres=form.rewiew.data,
                        created_at=datetime.utcnow(), images=str(paths), tags=form.tags.data)
-        location = Location(lat=form.lat.data, long=form.long.data, name=form.location_name.data,
-                            district=form.district.data, region=form.region.data,
-                            country=form.country.data)
 
-        data = '{' + str(form.manufacturer_other.data) + '}'
-        manufacturer = Manufacturer(name=form.manufacturer_name.data,
-                                    literature=form.literature.data,
-                                    other=data)
-        post.locations.append(location)
-        post.manufacturers.append(manufacturer)
-        location.manufacturers.append(manufacturer)
+        for i in location_ids:
+            loc = Location.query.get(i)
+            post.locations.append(loc)
+        for i in manufacturer_ids:
+            man = Manufacturer.query.get(i)
+            post.manufacturers.append(man)
 
         db.session.add(post)
-        db.session.add(location)
-        db.session.add(manufacturer)
         db.session.commit()
-        flash('Статья создана')
+        #flash('Статья создана')
         # return render_template('add_article.html', form=form)
         return redirect(url_for('blog.list_articles'))
 
-    return render_template('add_article.html', form=form)
+    return render_template('add_article.html', form=form, latest=last_created)
 
 
 @blog.route("/all")
 def list_articles():
     page = request.args.get('page', 1, type=int)
-    blog_posts = Article.query.order_by(Article.date.desc()).paginate(page=page, per_page=10)
+    blog_posts = Article.query.order_by(Article.created_at.desc()).paginate(page=page, per_page=10)
     return render_template('articles.html', blog_posts=blog_posts)
 
 
 @blog.route('<int:blog_post_id>')
 def blog_post(blog_post_id):
-
     blog_post = Article.query.get_or_404(blog_post_id)
     images = blog_post.images[:-1].split(',')
     for i in range(0, len(images)):
@@ -71,14 +66,13 @@ def blog_post(blog_post_id):
             images[i] = images[i]
         images[i] = images[i][2:-1]
 
-    return render_template('article.html', title=blog_post.header,
-                            date=blog_post.date, post=blog_post, photo_list=images)
+    return render_template('article.html', title=blog_post.title,
+                           date=blog_post.created_at, post=blog_post, photo_list=images)
 
 
-@blog.route('<int:blog_post_id>/delete')
+@blog.route('delete/<int:blog_post_id>')
 def delete_article(blog_post_id):
     article = Article.query.get_or_404(blog_post_id)
-    print(article)
     db.session.delete(article)
     db.session.commit()
     flash('Article has been deleted')
@@ -87,24 +81,61 @@ def delete_article(blog_post_id):
     return redirect(url_for('blog.list_articles'))
 
 
-@blog.route('/<int:blog_post_id>/update', methods=['GET', 'POST'])
+@blog.route('/update/<int:blog_post_id>', methods=['GET', 'POST'])
 def update(blog_post_id):
     article = Article.query.get_or_404(blog_post_id)
-
     form = AddArticleForm()
+    locs = Location.query.all()
+    form.locations.choices = [(l.id, l.name) for l in locs]
+    mans = Manufacturer.query.all()
+    form.manufacturers.choices = [(m.id, m.name) for m in mans]
     if form.validate_on_submit():
-        article.header = form.header.data
-        article.contents = form.content.data
-        article.location = form.location.data
-        article.region = form.region.data
-        db.session.commit()
-        flash('Запись обновлена')
-        return redirect(url_for('blog.blog_post', blog_post_id=article.id))
+        pics = request.files.getlist(form.pictures.name)
+        paths = []
+        try:
+            if pics:
+                for pic in pics:
+                    picture_contents = pic.stream.read()
+                    filepath = add_pic(pic_content=picture_contents, pic_name=pic.filename, title=form.title.data)
+                    paths.append(filepath)
+        except:
+            paths = ''
+        location_ids = form.locations.data
+        manufacturer_ids = form.manufacturers.data
+        post = Article(title=form.title.data, content=form.content.data, repres=form.rewiew.data,
+                       created_at=datetime.utcnow(), images=str(paths), tags=form.tags.data)
+        for i in location_ids:
+            loc = Location.query.get(i)
+            post.locations.append(loc)
+        for i in manufacturer_ids:
+            man = Manufacturer.query.get(i)
+            post.manufacturers.append(man)
+        return redirect(url_for(f'blog.blog_post', blog_post_id=article.id))
     elif request.method == 'GET':
-        form.header.data = article.header
+        form.title.data = article.title
+        form.tags.data = article.tags
         form.content.data = article.contents
-        form.location.data = article.location
-        form.location.data = article.location
-        form.region.data = article.region
-    return render_template('add_article.html', title='Update',
-                           form=form)
+        form.rewiew.data = article.review
+        form.pictures.data = article.images
+        db.session.add(article)
+        db.session.commit()
+        return render_template('add_article.html', form=form, latest=[])
+#
+# @app.route('/files/<path:filename>')
+# def uploaded_files(filename):
+#     path = '/the/uploaded/directory'
+#     return send_from_directory(path, filename)
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    f = request.files.get('upload')
+    # Add more validations here
+    extension = f.filename.split('.')[-1].lower()
+    if extension not in ['jpg', 'gif', 'png', 'jpeg']:
+        return upload_fail(message='Image only!')
+    filepath = os.path.join(current_app.root_path, 'static\post_photos')
+    f.save(filepath)
+    url = url_for('uploaded_files', filename=f.filename)
+    return upload_success(url, filename=f.filename)
+
+#filepath = os.path.join(current_app.root_path, 'static/post_photos'

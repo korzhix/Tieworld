@@ -2,33 +2,93 @@
 
 {%block content %}
 <div class="container">
-    <h1>{{ title }}</h1>
-    <p>{{ date }}</p>
-    {% if post.region %}
-         <p>{{ post.region }}</p>
-    {% endif %}
-    <br>
-    <p>{{ post.contents }}</p>
-    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                    <img src="/static/post_photos/{{ photo_list[0] }}" class="d-block w-100" alt="...">
+    <hr style="border: 5px solid #D17C00">
+    <div class="container"  style="width: 75%">
+
+        <h1>{{ title }}</h1>
+        <p>{{ date.strftime('%Y-%m-%d-%H:%M') }}</p>
+        {% for loc in post.locations %}
+            <span>- {{ loc.name }}, {{ loc.region }} {{ loc.counry }}.</span> <br>
+        {% endfor %}
+        <hr>
+        <br>
+        <p>{{ post.contents | safe}}</p>
+        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel" data-wrap="false">
+            <ol class="carousel-indicators">
+                <li data-bs-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                {% for i in range(1, photo_list|length) %}
+                    <li data-bs-target="#carouselExampleIndicators" data-slide-to="{{ i }}"></li>
+                {% endfor %}
+            </ol>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                        <img style=" height: 600px !important;" src="/static/post_photos/{{ photo_list[0] }}" class="d-block w-100" alt="...">
+                </div>
+                {% for path in photo_list[1:] %}
+                <div class="carousel-item" >
+                    <img style=" height: 600px !important;" src="/static/post_photos/{{ path }}" class="d-block w-100" alt="...">
+                </div>
+                {% endfor %}
             </div>
-            {% for path in photo_list[1:] %}
-            <div class="carousel-item">
-                <img src="/static/post_photos/{{ path }}" class="d-block w-100" alt="...">
-            </div>
-            {% endfor %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+
         </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
+        <hr style="border: 3px solid #D17C00">
+        <div class="row row-cols-1 row-cols-md-2 ">
+
+    {% for man in post.manufacturers %}
+    <div class="col">
+        <div class="card h-100 ">
+              <img src="/static/manufacturers_photos/manufacture_icon.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h2>{{ man.name }}</h2>
+            </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><b>Производство: </b>{{ man.name }} </li>
+            <li class="list-group-item"><b>Литература: </b>{{ man.literature }}</li>
+            <li class="list-group-item"><b>Дополнительно: </b>{{ man.other }}</li>
+            <li class="list-group-item"><b>Статьи: </b>{% for a in man.articles %} <a href="/article/{{ a.id }}">{{ a.title }}</a> {% endfor %} </li>
+            <li class="list-group-item"><b>Локации: </b> {% for l in man.locations %} <a href="/location/crud">{{ l.name }}</a>,  {% endfor %}</li>
+        </ul>
+        <div class="card-body">
+            <a href="/manufacturer/update/{{ man.id }}" class="btn btn-primary">Редактировать</a>
+            <a href="/manufacturer/delete/{{ man.id }}" class="btn btn-primary">Удалить</a>
+        </div>
+        </div>
     </div>
+    {% endfor %}
+        {% for loc in post.locations %}
+    <div class="col">
+        <div class="card h-100">
+              <img src="/static/map_photos/maP-marker.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h2>{{ loc.name }}</h2>
+                <hr style="width: 30%;border: 10px solid {{ loc.color.color_code }}; border-radius: 5px;">
+                <p class="card-text">{{ loc.colors }}</p>
+            </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><b>Координаты: </b>{{ loc.lat }}  {{ loc.long }} </li>
+            <li class="list-group-item"><b>Регион: </b>{{ loc.region }}</li>
+            <li class="list-group-item"><b>Район: </b>{{ loc.district }}</li>
+            <li class="list-group-item"><b>Страна: </b>{{ loc.country }}</li>
+            <li class="list-group-item"><b>Производители: </b> {% for m in loc.manufacturers %} <a href="/manufacturer/crud">{{ m.name }} </a>   {% endfor %}</li>
+            <li class="list-group-item"><b>Статьи: </b>{% for a in loc.articles %} <a href="/article/{{ a.id }}">{{ a.title }} </a> {% endfor %} </li>
+        </ul>
+        <div class="card-body">
+            <a href="/location/update/{{ loc.id }}" class="btn btn-primary">Редактировать</a>
+            <a href="/location/delete/{{ loc.id }}" class="btn btn-primary">Удалить</a>
+            <a href="/location/delete/{{ loc.id }}" class="btn btn-primary">Показать на карте</a>
+        </div>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 
 {% endblock %}

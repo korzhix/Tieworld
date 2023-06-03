@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="jumbotron container">
+    <h1>Производители</h1>
+    <p>Текущие производители: просмотрите список имеющихся производителей, редактируйте, или добавьте новых</p>
+    <div class="row">
+        <div class="col">
+            <hr>
+            <h3>{{ type_of_action }} производителя</h3>
+            <hr>
+            <form class="form-control w-75" method="POST">
+                     {{ form.hidden_tag() }}
+                <div class="form-group">
+                     {{ form.manufacturer_name.label(class="form-control-label") }}
+                     {{ form.manufacturer_name(class="form-control form-control-lg") }}
+                 </div>
+                 <div class="form-group">
+                    {{ form.manufacturer_other.label(class="form-control-label") }}
+                    {{ form.manufacturer_other(class="form-control form-control-lg") }}
+                 </div>
+                 <div class="form-group">
+                    {{ form.literature.label(class="form-control-label") }}
+                    {{ form.literature(class="form-control form-control-lg") }}
+                 </div>
+                <div class="form-group">
+                    {{ form.locations.label(class="form-control-label") }}
+                    {{ form.locations(class="form-select multiple form-control form-control-lg") }}
+                 </div>
+                <div class="form-group">
+                     {{ form.submit(class="btn btn btn-primary") }}
+                 </div>
+            </form>
+        </div>
+        <div class="col">
+            <hr>
+            <h3>Вы также можете добавить</h3>
+            <hr>
+            <a href="/location/crud" target="_blank" class="btn btn-primary" >Новую локацию</a>
+            <p>Если ее нет в списке</p>
+        </div>
+    </div>
+      <hr>
+  <h3>Текущие производители: </h3>
+      <hr>
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+
+    {% for man in mans %}
+    <div class="col">
+        <div class="card h-100 ">
+              <img src="/static/manufacturers_photos/manufacture_icon.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h2>{{ man.name }}</h2>
+            </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><b>Производство: </b>{{ man.name }} </li>
+            <li class="list-group-item"><b>Литература: </b>{{ man.literature }}</li>
+            <li class="list-group-item"><b>Дополнительно: </b>{{ man.other }}</li>
+            <li class="list-group-item"><b>Статьи: </b>{% for a in man.articles %} <a href="/article/{{ a.id }}">{{ a.title }}</a> {% endfor %} </li>
+            <li class="list-group-item"><b>Локации: </b> {% for l in man.locations %} <a href="/location/crud">{{ l.name }}</a>,  {% endfor %}</li>
+        </ul>
+        <div class="card-body">
+            <a href="/manufacturer/update/{{ man.id }}" class="btn btn-primary">Редактировать</a>
+            <a href="/manufacturer/delete/{{ man.id }}" class="btn btn-primary">Удалить</a>
+        </div>
+        </div>
+    </div>
+   {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}
+
