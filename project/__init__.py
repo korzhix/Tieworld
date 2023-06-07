@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy import MetaData
 from flask_ckeditor import CKEditor, upload_success, upload_fail
+from flask_login import LoginManager
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecretkey'
@@ -26,8 +27,8 @@ metadata = MetaData(
 db = SQLAlchemy(metadata=metadata, app=app)
 Migrate(app, db)
 ckeditor = CKEditor(app)
-
-
+login_manager = LoginManager()
+login_manager.init_app(app)
 def init_db():
     db.create_all()
     db.session.commit()
@@ -38,11 +39,16 @@ from project.map.views import gmap
 from project.crud.locations.views import locations
 from project.crud.colors.views import colors
 from project.crud.manufacturers.views import manufacturers
+from project.auth.views import auth
 app.register_blueprint(blog)
 app.register_blueprint(gmap)
 app.register_blueprint(locations)
 app.register_blueprint(colors)
 app.register_blueprint(manufacturers)
+app.register_blueprint(auth)
+
+login_manager.login_view = 'auth.login'
+login_manager.login_message = 'Войдите на сайт, для выполнения этого действия.'
 
 if __name__ == "__main__":
     init_db()

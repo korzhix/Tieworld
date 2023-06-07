@@ -1,6 +1,7 @@
 from project import db
 from datetime import datetime
-
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class Recomendation(db.Model):
     __tablename__ = "recomendations"
@@ -12,21 +13,40 @@ class Recomendation(db.Model):
         self.content = text
 
 
-#
-# class Comments(db.Model):
-#     # author text created_at
-#     pass
-#
-#
-# class User(db.Model):
-#     # login username pass_hash comments favourite
-#     pass
-#
-#
-# class UserGroups(db.Model):
-#     pass
-#
-#
+class User(db.Model, UserMixin):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+
+    #email = db.Column(db.String(255), nullable=False, unique=True)
+    #email_confirmed_at = db.Column(db.DateTime())
+    username = db.Column(db.String(50), nullable=False, unique=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    active = db.Column(db.Boolean()),
+    first_name = db.Column(db.String(50), nullable=True)
+    last_name = db.Column(db.String(50), nullable=True)
+    comments = db.relationship('Comment', backref='author')
+
+    @property
+    def password(self):
+        raise AttributeError('Password is not readable attribut')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    text = db.Column(db.String(2048))
+    created_at = db.Column(db.DateTime)
+    article_id = db.Column(db.Integer, db.ForeignKey('articles.id'))
+
+
 manufacturer_location = db.Table("manufacturer_location",
                                  db.Column('manufacturer_id', db.Integer, db.ForeignKey('manufacturers.id')),
                                  db.Column('location_id', db.Integer, db.ForeignKey('locations.id'))
@@ -60,6 +80,7 @@ class Article(db.Model):
     images = db.Column(db.String)
     locations = db.relationship('Location', secondary=article_location, backref='articles')
     manufacturers = db.relationship('Manufacturer', secondary=article_manufacturer, backref='articles')
+    comments = db.relationship('Comment', backref='article')
 
     def __init__(self, title, tags, content, repres, images, created_at=datetime.utcnow()):
 

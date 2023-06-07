@@ -2,7 +2,6 @@
 
 {%block content %}
 <div class="container">
-    <hr style="border: 5px solid #D17C00">
     <div class="container"  style="width: 75%">
 
         <h1>{{ title }}</h1>
@@ -13,20 +12,20 @@
         <hr>
         <br>
         <p>{{ post.contents | safe}}</p>
-        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel" data-wrap="false">
+        <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel" data-wrap="true">
             <ol class="carousel-indicators">
-                <li data-bs-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></li>
                 {% for i in range(1, photo_list|length) %}
-                    <li data-bs-target="#carouselExampleIndicators" data-slide-to="{{ i }}"></li>
+                    <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ i }}"></li>
                 {% endfor %}
             </ol>
             <div class="carousel-inner">
-                <div class="carousel-item active">
-                        <img style=" height: 600px !important;" src="/static/post_photos/{{ photo_list[0] }}" class="d-block w-100" alt="...">
+                <div class="carousel-item active" style="max-width: 1024px; max-height: 800px; width: 100%; height: 100%; overflow: hidden">
+                        <img style="height: 600px; width: 100%;  object-fit: contain;background-color: #000" src="/static/post_photos/{{ photo_list[0] }}" class="d-block w-100" alt="...">
                 </div>
                 {% for path in photo_list[1:] %}
-                <div class="carousel-item" >
-                    <img style=" height: 600px !important;" src="/static/post_photos/{{ path }}" class="d-block w-100" alt="...">
+                <div class="carousel-item"  style="max-width: 1024px; max-height: 800px; width: 100%; height: 100%; background-color: #000; overflow: hidden">
+                    <img style="height: 600px; width: 100%;  object-fit: contain;" src="/static/post_photos/{{ path }}" class="d-block w-100" alt="...">
                 </div>
                 {% endfor %}
             </div>
