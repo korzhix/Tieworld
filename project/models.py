@@ -3,25 +3,23 @@ from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-class Recomendation(db.Model):
-    __tablename__ = "recomendations"
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.Text)
 
-    # media?
-    def __init__(self, text):
-        self.content = text
+class UserGroup(db.Model):
+    __tablename__ = 'usergroups'
+    id = db.Column(db.String, primary_key=True)
+    create = db.Column(db.Boolean)
+    read = db.Column(db.Boolean)
+    update = db.Column(db.Boolean)
+    delete = db.Column(db.Boolean)
+    users = db.relationship('User', backref='usergroup')
 
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-
-    #email = db.Column(db.String(255), nullable=False, unique=True)
-    #email_confirmed_at = db.Column(db.DateTime())
+    usergroup_id = db.Column(db.ForeignKey('usergroups.id'))
     username = db.Column(db.String(50), nullable=False, unique=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    active = db.Column(db.Boolean()),
     first_name = db.Column(db.String(50), nullable=True)
     last_name = db.Column(db.String(50), nullable=True)
     comments = db.relationship('Comment', backref='author')

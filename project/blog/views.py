@@ -1,12 +1,14 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint, abort, current_app
 from project import db, app
 from flask import request
-from project.models import Article, Location, Manufacturer  # ManufacturerLocation
-from project.blog.forms import AddArticleForm
+from project.models import Article, Location, Manufacturer, Comment
+from project.blog.forms import AddArticleForm, AddCommentFrom
 from project.blog.picture_handler import add_pic
 from datetime import datetime
 from flask_ckeditor import upload_success, upload_fail
 import os
+from flask_login import current_user
+
 blog = Blueprint('blog', __name__, template_folder='templates/blog', url_prefix='/article')
 
 
@@ -57,17 +59,29 @@ def list_articles():
     return render_template('articles.html', blog_posts=blog_posts)
 
 
-@blog.route('<int:blog_post_id>')
-def blog_post(blog_post_id):
+@blog.route('<int:blog_post_id>', methods=['GET', 'POST'])
+def blog_post(blog_post_id, page=1):
     blog_post = Article.query.get_or_404(blog_post_id)
     images = blog_post.images[:-1].split(',')
+    form = AddCommentFrom()
+    page = request.args.get('page', 1, type=int)
+    comments = Comment.query.filter_by(article_id=blog_post_id).paginate(page=page, per_page=10)
+
+    if form.validate_on_submit() and current_user.is_authenticated:
+        comment = Comment(text=form.text.data)
+        comment.author = current_user
+        comment.article = blog_post
+        comment.created_at = datetime.utcnow()
+        db.session.add(comment)
+        db.session.commit()
+        return redirect(url_for('blog.blog_post', blog_post_id=blog_post_id))
     for i in range(0, len(images)):
         if i == 0:
             images[i] = images[i]
         images[i] = images[i][2:-1]
 
-    return render_template('article.html', title=blog_post.title,
-                           date=blog_post.created_at, post=blog_post, photo_list=images)
+    return render_template('article.html', form=form, title=blog_post.title,
+                           date=blog_post.created_at, post=blog_post, photo_list=images, comments=comments)
 
 
 @blog.route('delete/<int:blog_post_id>')
@@ -120,6 +134,10 @@ def update(blog_post_id):
         db.session.add(article)
         db.session.commit()
         return render_template('add_article.html', form=form, latest=[])
+
+
+
+
 #
 # @app.route('/files/<path:filename>')
 # def uploaded_files(filename):
@@ -138,4 +156,3 @@ def upload():
     url = url_for('uploaded_files', filename=f.filename)
     return upload_success(url, filename=f.filename)
 
-#filepath = os.path.join(current_app.root_path, 'static/post_photos'
