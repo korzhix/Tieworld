@@ -22,3 +22,11 @@ class AddCommentFrom(FlaskForm):
     text = TextAreaField('Текст сообщения')
     replied_to = TextAreaField()
     submit = SubmitField('Оставить комментарий')
+
+
+class FilterForm(FlaskForm):
+    region = SelectMultipleField('Регион', coerce=int, validators=[DataRequired()])
+    district = SelectMultipleField('Район', coerce=int, validators=[DataRequired()])
+    location_name = SelectMultipleField('Название н/п', coerce=int, validators=[DataRequired()])
+    manufacturer_name = SelectMultipleField('Производитель', coerce=int )
+    submit = SubmitField('Искать')

@@ -1,8 +1,9 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint, abort
-from project.models import Article
+from project.models import Article, Location, Manufacturer
 import folium
 import os
 from geopy.geocoders import Nominatim
+
 
 gmap = Blueprint('map', __name__, template_folder='templates/map', url_prefix='/map')
 
@@ -70,3 +71,31 @@ def create_map():
 @gmap.route('/show')
 def show_map():
     return render_template('map1.html')
+
+
+@gmap.route('show/<int:location_id>')
+def show_loc(location_id):
+    loc = Location.query.get(location_id)
+    articles = loc.articles
+    map = folium.Map(location=[loc.lat, loc.long], zoom_start=12)
+    label = '<ul>'
+    for i in articles:
+        label += f'\n<li><a href=/article/{i.id}>{i.title}</a></li>'
+    label += '</ul>'
+    folium.Marker(location=[loc.lat, loc.long], popup=label,
+                  icon=folium.Icon(color=loc.color.color_name)).add_to(map)
+    return render_template('show_loc.html', map=map._repr_html_())
+
+@gmap.route('/all')
+def show_all():
+    locs = Location.query.all()
+    map = folium.Map(location=[45.263034195319385, 37.4354044603708], zoom_start=7, width="100%", height='90%')
+    for loc in locs:
+        articles = loc.articles
+        label = '<ul>'
+        for i in articles:
+            label += f'\n<li><a href=/article/{i.id}>{i.title}</a></li>'
+        label += '</ul>'
+        folium.Marker(location=[loc.lat, loc.long], popup=label,
+                      icon=folium.Icon(color=loc.color.color_name)).add_to(map)
+    return render_template('show_loc.html', map=map._repr_html_())

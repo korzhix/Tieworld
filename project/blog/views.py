@@ -2,13 +2,14 @@ from flask import render_template, url_for, flash, redirect, request, Blueprint,
 from project import db, app
 from flask import request
 from project.models import Article, Location, Manufacturer, Comment
-from project.blog.forms import AddArticleForm, AddCommentFrom
+from project.blog.forms import AddArticleForm, AddCommentFrom, FilterForm
 from project.blog.picture_handler import add_pic
 from datetime import datetime
 from flask_ckeditor import upload_success, upload_fail
 import os
 from flask_login import current_user
-
+from sqlalchemy.orm import selectinload, joinedload, Query
+from sqlalchemy import and_
 blog = Blueprint('blog', __name__, template_folder='templates/blog', url_prefix='/article')
 
 
@@ -52,12 +53,56 @@ def add():
     return render_template('add_article.html', form=form, latest=last_created)
 
 
-@blog.route("/all")
+@blog.route("/all", methods=['GET', 'POST'])
 def list_articles():
+    filter_form = FilterForm()
+    locations = Location.query.all()
+    manufacturers = Manufacturer.query.all()
+    filter_form.region.choices = [(c.region, c.region) for c in locations]
+    filter_form.district.choices = [(c.district, c.district) for c in locations]
+    filter_form.location_name.choices = [(c.name, c.name) for c in locations]
+    filter_form.manufacturer_name.choices = [(c.name, c.name) for c in manufacturers]
     page = request.args.get('page', 1, type=int)
     blog_posts = Article.query.order_by(Article.created_at.desc()).paginate(page=page, per_page=10)
-    return render_template('articles.html', blog_posts=blog_posts)
+    return render_template('articles.html', blog_posts=blog_posts, filter_form=filter_form)
 
+
+@blog.route('/filter')
+def filter_result():
+    if request.args:
+        filter_form = FilterForm()
+        page = request.args.get('page', 1, type=int)
+        regions = [r for r in request.args.getlist('region')]
+        districts = [d for d in request.args.getlist('district')]
+        locs = [l for l in request.args.getlist('location_name')]
+        try:
+            request.args['manufacturer_name']
+            names = [r for r in request.args.getlist('manufacturer_name')]
+            articles = Article.query.join(Article.locations).filter(and_(Location.region.in_(regions),
+                                                                         Location.district.in_(districts),
+                                                                         Location.name.in_(locs))).join(\
+                Article.manufacturers).filter(Manufacturer.name.in_(names)).paginate(page=page, per_page=10)
+        except Exception as err:
+            articles = Article.query.join(Article.locations).filter(and_(Location.region.in_(regions),
+                                                                         Location.district.in_(districts),
+                                                                         Location.name.in_(locs))).paginate(page=page, per_page=10)
+        return render_template('articles.html', blog_posts=articles, filter_form=filter_form)
+
+
+@blog.route("/search")
+def w_search():
+    filter_form = FilterForm()
+    locations = Location.query.all()
+    manufacturers = Manufacturer.query.all()
+    filter_form.region.choices = [(c.region, c.region) for c in locations]
+    filter_form.district.choices = [(c.district, c.district) for c in locations]
+    filter_form.location_name.choices = [(c.name, c.name) for c in locations]
+    filter_form.manufacturer_name.choices = [(c.name, c.name) for c in manufacturers]
+    page = request.args.get('page', 1, type=int)
+    query = request.args.get('query')
+    blog_posts = Article.query.msearch(query, fields=['title', 'contents']).order_by(Article.created_at.desc()).paginate(page=page, per_page=10)
+
+    return render_template('articles.html', blog_posts=blog_posts, filter_form=filter_form)
 
 @blog.route('<int:blog_post_id>', methods=['GET', 'POST'])
 def blog_post(blog_post_id, page=1):
@@ -116,14 +161,17 @@ def update(blog_post_id):
             paths = ''
         location_ids = form.locations.data
         manufacturer_ids = form.manufacturers.data
-        post = Article(title=form.title.data, content=form.content.data, repres=form.rewiew.data,
-                       created_at=datetime.utcnow(), images=str(paths), tags=form.tags.data)
+        article.contents = form.content.data
+        article.review = form.rewiew.data
+        article.images = str(paths)
+        article.tags = form.tags.data
         for i in location_ids:
             loc = Location.query.get(i)
-            post.locations.append(loc)
+            article.locations.append(loc)
         for i in manufacturer_ids:
             man = Manufacturer.query.get(i)
-            post.manufacturers.append(man)
+            article.manufacturers.append(man)
+        db.session.commit()
         return redirect(url_for(f'blog.blog_post', blog_post_id=article.id))
     elif request.method == 'GET':
         form.title.data = article.title
@@ -155,4 +203,3 @@ def upload():
     f.save(filepath)
     url = url_for('uploaded_files', filename=f.filename)
     return upload_success(url, filename=f.filename)
-

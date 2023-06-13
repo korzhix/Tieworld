@@ -5,6 +5,8 @@ from flask_migrate import Migrate
 from sqlalchemy import MetaData
 from flask_ckeditor import CKEditor, upload_success, upload_fail
 from flask_login import LoginManager
+from flask_msearch import Search
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecretkey'
@@ -29,6 +31,9 @@ Migrate(app, db)
 ckeditor = CKEditor(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+search = Search()
+search.init_app(app)
+
 def init_db():
     db.create_all()
     db.session.commit()

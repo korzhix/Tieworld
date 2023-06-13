@@ -2,6 +2,7 @@ from project import db
 from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+import flask_whooshalchemy
 
 
 class UserGroup(db.Model):
@@ -69,6 +70,7 @@ class Manufacturer(db.Model):
 
 class Article(db.Model):
     __tablename__ = 'articles'
+    __searchable__ = ['title', 'contents' ]
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128))
     contents = db.Column(db.Text)
